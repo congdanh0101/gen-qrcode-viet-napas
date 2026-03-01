@@ -178,8 +178,8 @@ async function runGenerator() {
             const logoVietQR = new Image();
             const logoNapas = new Image();
             // Các logo nội bộ trong cùng project không cần crossOrigin
-            logoVietQR.src = '/image_logo/VietQR_Logo.png';
-            logoNapas.src = '/image_logo/Napas_Logo.png';
+            logoVietQR.src = 'image_logo/VietQR_Logo.png';
+            logoNapas.src = 'image_logo/Napas_Logo.png';
 
             await Promise.all([
                 new Promise(r => logoVietQR.onload = r),
