@@ -90,26 +90,28 @@ class VietQR {
 
 async function runGenerator() {
     const params = new URLSearchParams(window.location.search);
-    const bin = params.get('bin');
+    const bin = null;
+    const searchBank = params.get('bank'); // 970436
     const account = params.get('account');
     const amount = params.get('amount') || "";
     const content = params.get('content') || "";
     var bank = null;
 
-    if (!bin || !account) {
-        document.body.innerHTML = "Error generate QRCode VietQR - Napas";
-        return;
-    }
-
+    
     try {
         const response = await fetch('listBankNapas.json');
         if (!response.ok) throw new Error("Could not load bank list");
         
         const listBankData = await response.json();
-        bank = listBankData.find(item => item.bin === bin);
-
+        bank = listBankData.find(item => (item.bin && item.bin.toUpperCase() === searchBank.toUpperCase())
+                || (item.name && item.name.toUpperCase() === searchBank.toUpperCase())
+                || (item.shortName && item.shortName.toUpperCase() === searchBank.toUpperCase())
+                || (item['short_name'] && item['short_name'].toUpperCase() === searchBank.toUpperCase())
+                || (item.code && item.code.toUpperCase() === searchBank.toUpperCase())
+                || (item['swift_code'] && item['swift_code'].toUpperCase() === searchBank.toUpperCase()));
+        console.log(bank)
         if (!bank) {
-            document.body.innerHTML = `Error: Bank BIN "${bin}" is not supported or invalid.`;
+            document.body.innerHTML = `Error: Bank BIN "${searchBank}" is not supported or invalid.`;
             document.body.style.color = "red";
             return;
         }
@@ -118,17 +120,22 @@ async function runGenerator() {
         return;
     }
 
+    if (!bank || !account) {
+        document.body.innerHTML = "Error generate QRCode VietQR - Napas";
+        return;
+    }
+
     const vietqr = new VietQR();
     const qrString = vietqr
-        .setBeneficiaryOrganization(bin, account)
+        .setBeneficiaryOrganization(bank.bin, account)
         .setTransactionAmount(amount)
         .setAdditionalDataFieldTemplate(content)
         .build();
 
-    const qrSize = 600;
-    const padding = 60;
-    const headerHeight = 120; 
-    const footerHeight = 150;
+    const qrSize = 700;
+    const padding = 100;
+    const headerHeight = 180; 
+    const footerHeight = 120;
     
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
@@ -138,17 +145,14 @@ async function runGenerator() {
     ctx.fillStyle = "#ffffff";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // FIX LỖI SECURITY: Thêm crossOrigin cho Logo ngân hàng
     const drawBankLogo = () => {
         return new Promise(res => {
             const img = new Image();
-            img.crossOrigin = "Anonymous"; // QUAN TRỌNG
-            img.src = bank['logo']; 
-            
+            img.src = bank.logo; 
             img.onload = () => {
-                const maxH = 80;
+                const maxH = 150; // Logo ngân hàng to hơn (trước là 80)
                 const scale = maxH / img.height;
-                const dW = img.width * scale;
+                const dW = img.width * scale * 1.25;
                 const dH = img.height * scale;
                 ctx.drawImage(img, (canvas.width - dW) / 2, (headerHeight - dH) / 2, dW, dH);
                 res();
@@ -205,7 +209,7 @@ async function runGenerator() {
 
     const imageData = canvas.toDataURL("image/png"); // Hết lỗi
     document.body.innerHTML = ''; 
-    document.body.style.cssText = "margin:0; display:flex; justify-content:center; align-items:center; min-height:100vh; background:#f0f0f0;";
+    document.body.style.cssText = "margin:0; display:flex; justify-content:center; align-items:center; min-height:100vh; background:#000000;";
 
     const finalImg = document.createElement('img');
     finalImg.src = imageData;
