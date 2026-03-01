@@ -299,7 +299,7 @@
         "code": "TIMO",
         "bin": "963388",
         "shortName": "Timo",
-        "logo": "https://vietqr.net/portal-service/resources/icons/TIMO.png",
+        "logo": "image_logo/TIMO.png",
         "transferSupported": 1,
         "lookupSupported": 0,
         "short_name": "Timo",
