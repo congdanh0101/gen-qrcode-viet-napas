@@ -152,7 +152,7 @@ async function runGenerator() {
             img.onload = () => {
                 const maxH = 80; // Logo ngân hàng to hơn (trước là 80)
                 const scale = maxH / img.height;
-                const dW = img.width * scale * 1.25;
+                const dW = img.width * scale;
                 const dH = img.height * scale;
                 ctx.drawImage(img, (canvas.width - dW) / 2, (headerHeight - dH) / 2, dW, dH);
                 res();
@@ -186,7 +186,7 @@ async function runGenerator() {
                 new Promise(r => logoNapas.onload = r)
             ]);
 
-            const targetHeight = 70;
+            const targetHeight = 55;
             const centerY = headerHeight + qrSize + (footerHeight / 2);
             const centerX = canvas.width / 2;
             const w1 = logoVietQR.width * (targetHeight / logoVietQR.height);
@@ -198,8 +198,8 @@ async function runGenerator() {
             ctx.beginPath();
             ctx.moveTo(centerX, centerY - 40);
             ctx.lineTo(centerX, centerY + 40);
-            ctx.lineWidth = 2;
-            ctx.strokeStyle = "#dddddd";
+            ctx.lineWidth = 3;
+            ctx.strokeStyle = "#0c0c0c";
             ctx.stroke();
             resolve();
         });
@@ -210,7 +210,7 @@ async function runGenerator() {
     const imageData = canvas.toDataURL("image/png"); // Hết lỗi
     document.body.innerHTML = ''; 
     document.body.style.cssText = "margin:0; display:flex; justify-content:center; align-items:center; min-height:100vh; background:#000000;";
-
+    console.log(`imageData: ${imageData}`)
     const finalImg = document.createElement('img');
     finalImg.src = imageData;
     finalImg.style.cssText = "max-width:100%; box-shadow: 0 4px 15px rgba(0,0,0,0.1);";
